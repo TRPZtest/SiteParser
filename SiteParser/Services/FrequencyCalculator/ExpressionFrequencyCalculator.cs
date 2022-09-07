@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Linq;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SiteParser.Services.FrequencyCalculator
@@ -6,24 +8,20 @@ namespace SiteParser.Services.FrequencyCalculator
     public class ExpressionFrequencyCalculator
     {
         private int _expressionWordsCount;       
-        private string _text;
-    
-        public bool IgnoreGrammarWords { get; set; }
+        private List<string> _wordsList;
       
-        private Dictionary<string, int> countExpressions()
+        private Dictionary<string, int> CountExpressions()
         {
-            var expressionsDictionary = new Dictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
-            var wordsList = SplitString(_text).ToArray();
+            var expressionsDictionary = new Dictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);            
 
-            for (int i = 0; i < wordsList.Length - _expressionWordsCount; i++)
+            for (int i = 0; i < _wordsList.Count - _expressionWordsCount; i++)
             {
-                var currentExpression = wordsList[i];
+                var currentExpression = _wordsList[i];
                 if (_expressionWordsCount != 0)
                     for (int k = 1; k < _expressionWordsCount; k++)
-                        currentExpression += $" {wordsList[i + k]}";
+                        currentExpression += $" {_wordsList[i + k]}";
 
-                int currentCount;
-                expressionsDictionary.TryGetValue(currentExpression, out currentCount);
+                expressionsDictionary.TryGetValue(currentExpression, out int currentCount);
 
                 currentCount++;
                 expressionsDictionary[currentExpression] = currentCount;
@@ -42,18 +40,32 @@ namespace SiteParser.Services.FrequencyCalculator
         {
             return s.Split(' ');
         }
-        public List<CalculationResult> CalculateFrequencies(string text, int WordsNumber)
+        public List<CalculationResult> CalculateFrequencies(string text, int WordsNumber, bool ignoreGrammarWords = false)
         {
             _expressionWordsCount = WordsNumber;
-            _text = FormatString(text);
+            _wordsList  = SplitString(FormatString(text)).ToList();
 
-            var expressionsDictionary = countExpressions();
+            if (ignoreGrammarWords == true)
+            {
+                var grammarWords = GetGrammarWords().Result;
+                _wordsList = _wordsList.Where(item => !grammarWords.Contains(item, StringComparer.CurrentCultureIgnoreCase)).ToList();
+            }             
+
+            var expressionsDictionary = CountExpressions();
+                        
             var result = new List<CalculationResult>();
             var totalCount = expressionsDictionary.Sum(x => x.Value);
 
             foreach (var expression in expressionsDictionary)
                 result.Add(new CalculationResult { Expression = expression.Key, Frequency = (float)expression.Value / totalCount, Count = expression.Value });
             return result;
+        }
+        protected virtual async Task <List<string>> GetGrammarWords()
+        {
+            using FileStream stream = File.OpenRead("GrammаrWords.json");
+            var words = await JsonSerializer.DeserializeAsync<GrammarWordsProxy>(stream);
+            
+            return words.GrammarWordsList;
         }
     }
 }

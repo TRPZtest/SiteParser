@@ -28,7 +28,27 @@ namespace UnitTests
 
             Assert.True(5 == results.Where(x => x.Count == 3).Count()); // 5 слов по 3  раза повторяются
         }
+        [Fact]
+        public void TestWithGrammars()
+        {
+            var calculator = new ExpressionFrequencyCalculator();
+            var text = "«Split PDF document online is a web service that allows you to split your PDF document into separate\r\npages. This simple application has several modes of operation, you can split your PDF document into\r\nseparate pages, i.e. each page of the original document will be a separate PDF document, you can split\r\nyour document into even and odd pages, this function will come in handy if you need to print a document in\r\nthe form of a book, you can also specify page numbers in the settings and the Split PDF application will\r\ncreate separate PDF documents only with these pages and the fourth mode of operation allows you to\r\ncreate a new PDF document in which there will be only those pages that you specified.»";
 
+            var results = calculator.CalculateFrequencies(text, 1, false);
+         
+
+            Assert.True(4 == results.Where(x => x.Count == 4).Count()); // 4 слов по 4  раза повторяются   8. separate 4 (3.1%) 9. of 4 (3.1%) 10. will 4 (3.1%) 11. in ***** в примере еще Split, но их 5 на самом деле.
+        }
+        [Fact]
+        public void TestWithotGrammars()
+        {
+            var calculator = new ExpressionFrequencyCalculator();
+            var text = "«Split PDF document online is a web service that allows you to split your PDF document into separate\r\npages. This simple application has several modes of operation, you can split your PDF document into\r\nseparate pages, i.e. each page of the original document will be a separate PDF document, you can split\r\nyour document into even and odd pages, this function will come in handy if you need to print a document in\r\nthe form of a book, you can also specify page numbers in the settings and the Split PDF application will\r\ncreate separate PDF documents only with these pages and the fourth mode of operation allows you to\r\ncreate a new PDF document in which there will be only those pages that you specified.»";
+
+            var results = calculator.CalculateFrequencies(text, 1, true);
+     
+            Assert.True(1 == results.Where(x => x.Count == 4).Count()); // 1 слово 4 раза - separate, will как граммар
+        }
         [Fact]
         public void ControllerTest()
         {

@@ -23,7 +23,7 @@ namespace SiteParser.Controllers
 
                 var calculator = new ExpressionFrequencyCalculator();
                 
-                var results = calculator.CalculateFrequencies(stringContent, request.WordsNumber).OrderByDescending(item => item.Count).Take(request.Top);
+                var results = calculator.CalculateFrequencies(stringContent, request.WordsNumber, request.IngoreGrammarWords).OrderByDescending(item => item.Count).Take(request.Top);
 
                 return new ParseTextResponse { Code = 0, Message = "Success", CalculationResults = results.ToList() };
             }

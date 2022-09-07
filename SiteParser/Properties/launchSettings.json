@@ -2,6 +2,8 @@
   "profiles": {
     "SiteParser": {
       "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "WordCounter/Index",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

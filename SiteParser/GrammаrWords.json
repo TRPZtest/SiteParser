@@ -1,5 +1,5 @@
 {
-  "functionWords": [
+  "grammarWordsList": [
     "the",
     "which",
     "still",
@@ -30,8 +30,7 @@
     "between",
     "along",
     "till",
-    "in",
-    "will",
+    "in",  
     "might",
     "round",
     "herself",
@@ -147,6 +146,7 @@
     "no",
     "three",
     "whether",
+    "will",
     "inside",
     "his",
     "little",
