@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SiteParser.Models;
 using SiteParser.Services.FrequencyCalculator;
-using System.Net.Http;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace SiteParser.Controllers
@@ -12,7 +10,7 @@ namespace SiteParser.Controllers
     public class ParserController : ControllerBase
     {
         [HttpPost]
-        public async Task<ParseTextResponse> ParseText(ParseTextRequest request)
+        public async Task<ParseTextResponse> ParseText([FromBody]ParseTextRequest request)
         {
             try
             {
@@ -34,9 +32,11 @@ namespace SiteParser.Controllers
                 return new ParseTextResponse() { Code = 1, Message = $"Error: {ex.Message} {ex.StackTrace}" };
             }            
         }
-
-        private static string FormatHtml(string html) // Deleting tags
+        [NonAction]
+        public static string FormatHtml(string html) // Deleting tags
         {
+            Regex removeStyles = new Regex("<style[^<]*</style\\s*>");
+            html = removeStyles.Replace(html, "");
             Regex rRemScript = new(@"<script[^>]*>[\s\S]*?</script>");
             html = rRemScript.Replace(html, "");
             html = Regex.Replace(html, "<.*?>|&.*?;", string.Empty);

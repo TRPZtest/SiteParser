@@ -2,6 +2,7 @@
 
 namespace SiteParser.Controllers
 {
+    [Route("[controller]/[action]")]
     public class WordCounterController : Controller
     {
         public IActionResult Index()

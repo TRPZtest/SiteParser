@@ -32,7 +32,7 @@ namespace SiteParser.Services.FrequencyCalculator
         }
         protected virtual string FormatString(string s)
         {      
-            s = Regex.Replace(s, "[^a-zA-Z0-9 -]", " ");
+            s = Regex.Replace(s, "[^a-zA-Z ]", " ");
 
             s = Regex.Replace(s, @"\s+", " ").Trim();
 

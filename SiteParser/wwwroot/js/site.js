@@ -1,4 +1,36 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿$("#count").on("click", function () {
 
-// Write your JavaScript code.
+    let top = $("#topInput").val();
+    let wordsNumber = $("#nWordInput").val();
+    let ingoreGrammarWords = $("#ignoreGwInput").is(":checked");
+    let url = $("#linkInput").val()
+    $('#records_table').empty();
+    let request = {
+        url: url,
+        wordsNumber: wordsNumber,
+        top: top,
+        ingoreGrammarWords: ingoreGrammarWords
+    }
+
+    $.ajax(
+        {
+            url: "/Parser/ParseText",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(request),
+            success: function (response) {
+               
+                DrawTable(response);
+            }
+        });
+});
+
+
+function DrawTable(data) {
+    var trHTML = '';
+    $.each(data.calculationResults, function (i, item) {
+        trHTML += '<tr><td>' + item.expression + '</td><td>' + item.count + '</td><td>' + (item.frequency * 100).toFixed(2) + '%'  + '</td></tr>';
+    });
+
+    $('#records_table').append(trHTML);
+}
