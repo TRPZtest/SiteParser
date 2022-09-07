@@ -24,6 +24,7 @@ namespace SiteParser.Controllers
                 stringContent = FormatHtml(stringContent);
 
                 var calculator = new ExpressionFrequencyCalculator();
+                
                 var results = calculator.CalculateFrequencies(stringContent, request.WordsNumber).OrderByDescending(item => item.Count).Take(request.Top);
 
                 return new ParseTextResponse { Code = 0, Message = "Success", CalculationResults = results.ToList() };
@@ -34,9 +35,9 @@ namespace SiteParser.Controllers
             }            
         }
 
-        private string FormatHtml(string html)
+        private static string FormatHtml(string html) // Deleting tags
         {
-            Regex rRemScript = new Regex(@"<script[^>]*>[\s\S]*?</script>");
+            Regex rRemScript = new(@"<script[^>]*>[\s\S]*?</script>");
             html = rRemScript.Replace(html, "");
             html = Regex.Replace(html, "<.*?>|&.*?;", string.Empty);
             return html;

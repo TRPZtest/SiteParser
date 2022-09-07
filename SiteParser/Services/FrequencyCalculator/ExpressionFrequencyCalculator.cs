@@ -7,6 +7,8 @@ namespace SiteParser.Services.FrequencyCalculator
     {
         private int _expressionWordsCount;       
         private string _text;
+    
+        public bool IgnoreGrammarWords { get; set; }
       
         private Dictionary<string, int> countExpressions()
         {
@@ -15,9 +17,10 @@ namespace SiteParser.Services.FrequencyCalculator
 
             for (int i = 0; i < wordsList.Length - _expressionWordsCount; i++)
             {
-                var currentExpression = wordsList[i] + " " + wordsList[i + 1];
-                for (int k = 1; k < _expressionWordsCount; k++)
-                    currentExpression += $" {wordsList[i + k]}";
+                var currentExpression = wordsList[i];
+                if (_expressionWordsCount != 0)
+                    for (int k = 1; k < _expressionWordsCount; k++)
+                        currentExpression += $" {wordsList[i + k]}";
 
                 int currentCount;
                 expressionsDictionary.TryGetValue(currentExpression, out currentCount);
@@ -28,7 +31,7 @@ namespace SiteParser.Services.FrequencyCalculator
             return expressionsDictionary;
         }
         protected virtual string FormatString(string s)
-        {
+        {      
             s = Regex.Replace(s, "[^a-zA-Z0-9 -]", " ");
 
             s = Regex.Replace(s, @"\s+", " ").Trim();
@@ -42,14 +45,14 @@ namespace SiteParser.Services.FrequencyCalculator
         public List<CalculationResult> CalculateFrequencies(string text, int WordsNumber)
         {
             _expressionWordsCount = WordsNumber;
-            _text = text;
+            _text = FormatString(text);
 
             var expressionsDictionary = countExpressions();
             var result = new List<CalculationResult>();
             var totalCount = expressionsDictionary.Sum(x => x.Value);
 
             foreach (var expression in expressionsDictionary)
-                result.Add(new CalculationResult { Expression = expression.Key, Frequency = expression.Value / totalCount });
+                result.Add(new CalculationResult { Expression = expression.Key, Frequency = (float)expression.Value / totalCount, Count = expression.Value });
             return result;
         }
     }
